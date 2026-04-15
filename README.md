@@ -177,3 +177,5 @@ These exist to make the analytical work transparent and searchable — the same 
 ## 📬 Contact
 
 Feel free to connect or raise an issue for feedback or questions!
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/srivatchan2004/)
