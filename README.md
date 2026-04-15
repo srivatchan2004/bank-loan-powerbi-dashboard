@@ -21,10 +21,17 @@ bank-loan-dashboard/
 ├── README.md
 ├── bank_loan_report.pbix        ← Power BI report file
 ├── data/
-│   └── bank_loan_data.csv       ← Source dataset
-└── images/
-    ├── summary.png              ← Summary page screenshot
-    └── overview.png             ← Overview page screenshot
+│   └── financial_loan.csv       ← Source dataset
+├── images/
+│   ├── summary.png              ← Summary page screenshot
+│   └── overview.png             ← Overview page screenshot
+└── sql/
+    ├── 00_setup.sql             ← CREATE DATABASE / TABLE, LOAD DATA, sanity check
+    ├── 01_kpi_summary.sql       ← Headline KPIs, MTD, MoM % (CTE + CASE WHEN)
+    ├── 02_loan_quality_breakdown.sql  ← Good/Bad split, Loan Status table, Grade breakdown
+    ├── 03_geographic_performance.sql  ← State-level performance (choropleth source)
+    ├── 04_top_n_ranking.sql     ← Purpose / Emp Length / Term rankings (ROW_NUMBER CTE)
+    └── 05_monthly_trend.sql     ← Monthly trend + MoM % (CASE WHEN CTE + LAG)
 ```
 
 ---
@@ -84,11 +91,63 @@ Trend and distribution analysis across multiple dimensions.
 
 ---
 
+## 🗄️ SQL Queries
+
+The `sql/` folder contains MySQL scripts that recreate every metric visible in the dashboard.  
+These exist to make the analytical work transparent and searchable — the same logic lives inside the `.pbix` as DAX measures.
+
+| File | Description | Key SQL Technique |
+|---|---|---|
+| [`00_setup.sql`](sql/00_setup.sql) | Create database & table; load CSV with date conversion | `LOAD DATA LOCAL INFILE`, `STR_TO_DATE` |
+| [`01_kpi_summary.sql`](sql/01_kpi_summary.sql) | Headline KPIs, MTD values, MoM % change | CTE + `CASE WHEN` pivot |
+| [`02_loan_quality_breakdown.sql`](sql/02_loan_quality_breakdown.sql) | Good/Bad loan split, Loan Status table, Grade breakdown | Conditional aggregation (`SUM CASE WHEN`) |
+| [`03_geographic_performance.sql`](sql/03_geographic_performance.sql) | State-level applications, funded amount, bad-loan rate | Grouped aggregation, `HAVING`, subquery |
+| [`04_top_n_ranking.sql`](sql/04_top_n_ranking.sql) | Purpose, Employment Length, and Term rankings | `ROW_NUMBER()` window function in CTE |
+| [`05_monthly_trend.sql`](sql/05_monthly_trend.sql) | Monthly trend, MoM %, quarterly rollup | `CASE WHEN` CTE + `LAG()` window function |
+
+### KPI Verification vs Dashboard
+
+| Metric | SQL Formula | Dashboard Value | Status |
+|---|---|---|---|
+| Total Loan Applications | `COUNT(*)` | 38.6 K | ✅ Match |
+| Total Funded Amount | `SUM(loan_amount)` | $435.8 M | ✅ Match |
+| Total Amount Received | `SUM(total_payment)` | $473.1 M | ✅ Match |
+| Average Interest Rate | `AVG(int_rate) * 100` | 12.0 % | ✅ Match — rate stored as decimal (0.12), multiply × 100 |
+| Average DTI | `AVG(dti) * 100` | 13.3 % | ✅ Match — DTI stored as decimal (0.133), multiply × 100 |
+| Good Loan % | `SUM(status IN ('Fully Paid','Current')) / COUNT(*) * 100` | 86.2 % | ✅ Match |
+| Bad Loan % | `SUM(status = 'Charged Off') / COUNT(*) * 100` | 13.8 % | ✅ Match |
+| MTD values | Filter `YEAR = 2021 AND MONTH = 12` | e.g. 4.3 K apps | ⚠️ Hardcoded Dec 2021 — Power BI uses dynamic `DATESMTD(TODAY())` |
+| MoM % | `(current - previous) / previous * 100` via `LAG()` | e.g. 6.9 % | ✅ Arithmetic match — DAX uses `PARALLELPERIOD`, SQL uses `LAG()`, same result |
+
+### Running the Scripts in MySQL Workbench
+
+1. **Enable local file loading** — run once per session before `00_setup.sql`:
+   ```sql
+   SET GLOBAL local_infile = 1;
+   ```
+   Or launch MySQL Workbench / the CLI with the `--local-infile=1` flag.
+
+2. **Update the file path** in `00_setup.sql` (line ~60):
+   ```sql
+   LOAD DATA LOCAL INFILE 'C:/your/path/to/data/financial_loan.csv'
+   ```
+
+3. **Run in order** — open each file in Workbench and execute with `Ctrl+Shift+Enter`:
+   ```
+   00_setup.sql  →  01_kpi_summary.sql  →  02 … 03 … 04 … 05
+   ```
+
+4. **Verify** — the sanity-check query at the bottom of `00_setup.sql` should return:
+   `total_applications = 38,576 | funded_m = 435.8 | received_m = 473.1`
+
+---
+
 ## 🛠️ Tools Used
 
 | Tool | Purpose |
 |---|---|
 | Power BI Desktop | Dashboard design & DAX measures |
+| MySQL | SQL query development & KPI validation |
 | CSV | Source data |
 | DAX | KPI calculations (MTD, MoM %, Good/Bad loan %, DTI) |
 | Power Query | Data cleaning & transformation |
