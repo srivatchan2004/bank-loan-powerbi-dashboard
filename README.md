@@ -142,6 +142,26 @@ These exist to make the analytical work transparent and searchable — the same 
 
 ---
 
+## 🛠️ Skills Demonstrated
+
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![DAX](https://img.shields.io/badge/DAX-F2C811?style=flat&logo=powerbi&logoColor=black)
+![Data Analytics](https://img.shields.io/badge/Data%20Analytics-0078D4?style=flat&logo=microsoftazure&logoColor=white)
+![Excel](https://img.shields.io/badge/Excel-217346?style=flat&logo=microsoftexcel&logoColor=white)
+
+| Skill | Applied In This Project |
+|---|---|
+| **Power BI** | Two-page interactive dashboard, slicers, KPI cards, donut/bar/map visuals |
+| **DAX** | MTD, MoM %, Good/Bad loan %, DTI and interest rate measures |
+| **MySQL** | 6 query files — window functions, CTEs, MoM analysis, LOAD DATA |
+| **Data Modelling** | Date table, calculated columns, measure table, relationships |
+| **SQL Window Functions** | `ROW_NUMBER()`, `LAG()`, `PARTITION BY`, `CASE WHEN` pivot |
+| **Data Cleaning** | Date format parsing (`STR_TO_DATE`), null handling, type casting |
+
+---
+
 ## 🛠️ Tools Used
 
 | Tool | Purpose |
@@ -178,4 +198,5 @@ These exist to make the analytical work transparent and searchable — the same 
 
 Feel free to connect or raise an issue for feedback or questions!
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/srivatchan2004/)
+[![Portfolio](https://img.shields.io/badge/Portfolio-srivatchan2004.github.io-0A66C2?style=flat&logo=github&logoColor=white)](https://srivatchan2004.github.io)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/srivatchan2004/)
